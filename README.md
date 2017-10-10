@@ -44,7 +44,7 @@ Which will take as training data all the files passed as arguments, and all the 
 passed as arguments. The trained model will be saved in the specified location.
 Please note: acoustic training data needs to be .wav (Microsoft), 32bit float PCM.
 For each .wav file passed as training, a corresponding .txt file with identical name needs to contain its ground truth,
-one target per line. NOTE: spaces are not allowed as characters in ground truth -- please replace them with another
+**one target/character per line**. NOTE: spaces are not allowed as characters in ground truth -- please replace them with another
 character.
 
 When launching S&T, operator chains can be specified manually through CLI parameters, such as:

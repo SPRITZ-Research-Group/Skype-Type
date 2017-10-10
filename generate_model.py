@@ -115,7 +115,7 @@ if __name__ == "__main__":
     # For each worker get features and labels and put them in final arrays X and y
     # They start as lists (we don't know their lengths yet)
     print "Found {} files already mined".format(len(press_files))
-    print "Found {} files to mine".format(len(wav_files))
+    print "Found {} files to mine".format(len(wav_files) - len(press_files))
     f_X, f_y = [], []
     error_queue = []
 
@@ -143,7 +143,13 @@ if __name__ == "__main__":
 
         for wav_file, y, oq, dq in events_queue:
             n_res = dq.get()
+            if not len(y.shape):
+                # Happens if a ground truth file has a single row
+                # This is probably not what the user means, but we can't be sure
+                # So we just assumes he intended it
+                y = y.reshape(1)
             if n_res != len(y):
+                # More mined events than ground truth values
                 error_queue.append((wav_file, n_res, len(y)))
             else:
                 _x = []
@@ -168,7 +174,6 @@ if __name__ == "__main__":
         f_X.extend(np.loadtxt(press_file))
         f_y.extend(np.loadtxt(label_file, dtype=str))
     f_X, f_y = np.array(f_X), np.array(f_y)
-    print f_X.shape, f_y.shape, f_X[0].shape
 
     # Load pipeline steps
     # 1 - Feature extraction
@@ -192,4 +197,4 @@ if __name__ == "__main__":
     print "Writing model to disk"
     joblib.dump(clf, args.output_file)
     print "Estimating accuracy..."
-    print cross_val_score(clf, f_X, f_y, cv=args.folds+1)
+    print np.mean(cross_val_score(clf, f_X, f_y, cv=args.folds+1))

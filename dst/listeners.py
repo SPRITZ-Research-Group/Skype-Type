@@ -6,7 +6,7 @@ warnings.filterwarnings("ignore")
 
 def wavfile(in_file, out_queue, config):
     _, mono = al.load(in_file)
-    out_queue.put(mono)
+    out_queue.put(list(mono))
     out_queue.put(None)
 
 
