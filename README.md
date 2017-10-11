@@ -59,7 +59,7 @@ More information about each block, possible options, and usage can be found on t
 
 ## Examples
 
-Generate a model from training data in file1.wav, file1.txt, and all files in folder1 and folder2, and save it in folder3/model:
+Generate a model from training data in file1.wav, file1.txt, and all files in folder1 and folder2, and save it in folder3/model(note: specifying individual filenames will force the program to reprocess the specified files each time and not take advantage of the generated press files it is better to specify a containing folder of the wav and txt files):
 
 > generate_model.py file1.wav file1.txt folder1 folder2 folder3/model
 
