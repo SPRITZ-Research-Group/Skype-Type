@@ -1,4 +1,6 @@
-#! /usr/bin/python2
+#! /usr/bin/python3
+
+# python smart_dictionary.py -l wavfile -t ../../samples/TEAC_target/ -p model -d offline > dict_temp.txt
 import os
 import argparse
 import time
@@ -60,7 +62,7 @@ if __name__ == "__main__":
     # Define the sklearn pipeline to use
     # Multiple pipelines will be allowed - each will receive from dispatcher
     # Watch out - right now only a SINGLE pipeline works
-    parser.add_argument("--pipeline", "-p", action='append', type=file, required=True,
+    parser.add_argument("--pipeline", "-p", action='append', type=argparse.FileType('r'), required=True,
                         help='Trained pipeline created by generate_model.py')
     # General options
     parser.add_argument("--workers", "-w", type=int, default=CONFIG.workers,
@@ -104,10 +106,10 @@ if __name__ == "__main__":
     #
     # Configuration - update values
     #
-    for key in vars(CONFIG).iterkeys():
+    for key in vars(CONFIG).keys():
         if key in vars(args).keys():
             CONFIG.key = args[key]
-    for key, val in vars(args).iteritems():
+    for key, val in vars(args).items():
         CONFIG.key = val
     for target in target_files:
         #
@@ -138,7 +140,7 @@ if __name__ == "__main__":
         # For each pipeline, create a pool of workers
         for p_idx, pipeline in enumerate(args.pipeline):
             iq, rq = Queue(), Queue()
-            for n_worker in xrange(args.workers):
+            for n_worker in range(args.workers):
                 p = Process(target=worker, args=(pipeline, iq, rq, args.n_predictions, CONFIG))
                 p.daemon = True
                 p.start()
