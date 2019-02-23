@@ -21,14 +21,14 @@ def dictionary_filter(guesses, wl, howmany=50):
 
 
 def dictionary_interactive(preds, config):
-    ans = raw_input("ARE THESE WORDS? [Y/n] ")
+    ans = input("ARE THESE WORDS? [Y/n] ")
     if ans == 'n':
         return
-    separators = raw_input("Which are the word separators? (separated with spaces): ").split(" ")
+    separators = input("Which are the word separators? (separated with spaces): ").split(" ")
 
     proposals = [i for i, x in enumerate(preds) if len(set(separators) & set(x)) and
                  min([x.index(c) for c in set(separators) & set(x)]) < config.dict_sep_threshold]
-    ans = raw_input("Hint me the correct word segmentation (Suggested spaces in {}): ".format(proposals))
+    ans = input("Hint me the correct word segmentation (Suggested spaces in {}): ".format(proposals))
     if ans == '':
         spaces = proposals + [len(preds)]
     else:
@@ -40,17 +40,17 @@ def dictionary_interactive(preds, config):
         for fn in fs:
             dictionaries.append(os.path.abspath(os.path.join(r, fn)))
     if len(dictionaries) == 0:
-        print "No dictionaries available!"
+        print("No dictionaries available!")
         return
-    print "Available dictionaries:"
+    print("Available dictionaries:")
     for i, d in enumerate(dictionaries):
-        print "{} - {}".format(i, d)
-    ans = raw_input("Select dictionary number ([0]): ") or 0
+        print("{} - {}".format(i, d))
+    ans = input("Select dictionary number ([0]): ") or 0
 
     wl = np.loadtxt(dictionaries[int(ans)], dtype=str)
     for space in spaces:
         word_guesses = preds[last_idx:space]
-        print "WORD FROM CHARACTER {} to {}".format(last_idx, space)
-        print dictionary_filter(word_guesses, wl, 30)
-        print ""
+        print("WORD FROM CHARACTER {} to {}".format(last_idx, space))
+        print(dictionary_filter(word_guesses, wl, 30))
+        print("")
         last_idx = space + 1

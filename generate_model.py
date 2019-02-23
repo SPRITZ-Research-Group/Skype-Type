@@ -1,4 +1,4 @@
-#! /usr/bin/python2
+#! /usr/bin/python3
 
 import argparse
 import importlib
@@ -102,30 +102,29 @@ if __name__ == "__main__":
             if os.path.splitext(os.path.basename(l_f))[0] == basename:
                 pressfiles_map[f] = l_f
 
-    mismatches = [x for x, y in wavfiles_map.iteritems() if y is None] + \
-                 [x for x, y in pressfiles_map.iteritems() if y is None]
+    mismatches = [x for x, y in wavfiles_map.items() if y is None] + \
+                 [x for x, y in pressfiles_map.items() if y is None]
     if len(mismatches) != 0:
-        print "Can't find labels for some wav files / press files!"
-        print "Offending files:"
+        print("Can't find labels for some wav files / press files!")
+        print("Offending files:")
         for f in mismatches:
-            print f
+            print(f)
         exit()
 
     # Divide each file in samples corresponding to keys
     # For each worker get features and labels and put them in final arrays X and y
     # They start as lists (we don't know their lengths yet)
-    print "Found {} files already mined".format(len(press_files))
-    print "Found {} files to mine".format(len(wav_files) - len(press_files))
+    print("Found {} files already mined".format(len(press_files)))
+    print("Found {} files to mine".format(len(wav_files) - len(press_files)))
     f_X, f_y = [], []
     error_queue = []
-
     # We divide files in groups of n_thread size
     # We iterate over groups, and spawn a miner process for each file
     # We then wait for them to implicitly join when reporting results, and collect mined data
-    for grp_idx, grp_it in itertools.groupby(enumerate(wavfiles_map.iteritems()), lambda _fg: _fg[0] / args.n_threads):
+    for grp_idx, grp_it in itertools.groupby(enumerate(wavfiles_map.items()), lambda _fg: int(_fg[0] / args.n_threads)):
         events_queue = []
         for i, (wav_file, label_file) in grp_it:
-            print "Processing file #{}".format(i + 1)
+            print("Processing file #{}".format(i + 1))
             lq = Queue()
             p = Process(target=wavfile, args=(wav_file, lq, CONFIG))
             p.daemon = True
@@ -164,13 +163,13 @@ if __name__ == "__main__":
                 f_y.extend(y)
 
     if len(error_queue) != 0:
-        print "Error in reading some files - wrong n. of keypresses found:"
+        print("Error in reading some files - wrong n. of keypresses found:")
         for f, found, expected in error_queue:
-            print "{} - found {}, expected {}".format(f, found, expected)
+            print("{} - found {}, expected {}".format(f, found, expected))
         exit()
 
     # .press files already present only need to be loaded from disk and appended to the matrix
-    for i, (press_file, label_file) in enumerate(pressfiles_map.iteritems()):
+    for i, (press_file, label_file) in enumerate(pressfiles_map.items()):
         f_X.extend(np.loadtxt(press_file))
         f_y.extend(np.loadtxt(label_file, dtype=str))
     f_X, f_y = np.array(f_X), np.array(f_y)
@@ -190,11 +189,11 @@ if __name__ == "__main__":
     pipeline.append(('Classifier', classifier))
     clf = Pipeline(pipeline)
 
-    print "Learning..."
+    print("Learning...")
     # Fit and save fitted model to file. Output stats about estimated accuracy
     clf.fit(f_X, f_y)
-    print "Learning task completed!"
-    print "Writing model to disk"
+    print("Learning task completed!")
+    print("Writing model to disk")
     joblib.dump(clf, args.output_file)
-    print "Estimating accuracy..."
-    print np.mean(cross_val_score(clf, f_X, f_y, cv=args.folds+1))
+    print("Estimating accuracy...")
+    print(np.mean(cross_val_score(clf, f_X, f_y, cv=args.folds+1)))

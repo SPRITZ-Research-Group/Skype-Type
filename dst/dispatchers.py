@@ -43,7 +43,7 @@ def offline(in_queue, out_queue, display_queue, config):
             if peaks[x] >= tau:
                 if x - past_x >= minimum_interval:
                     # It is a keypress event (maybe)
-                    keypress = al.normalize(data[x:x + sample_length])
+                    keypress = al.normalize(data[x:x + int(sample_length)])
                     past_x = x
                     # Pass it immediately to workers
                     out_queue.put([idx, keypress])
@@ -62,5 +62,5 @@ def offline(in_queue, out_queue, display_queue, config):
             pass
 
     # Send termination flag to workers
-    for _x in xrange(config.workers):
+    for _x in range(config.workers):
         out_queue.put((-1, None))

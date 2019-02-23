@@ -42,8 +42,8 @@ class Config:
         """.format(VERSION, PROJECT_URL, LICENSE).split("\n")
 
     # Dispatcher options
-    dispatcher_threshold = 90
-    dispatcher_min_interval = 8000
+    dispatcher_threshold = 80
+    dispatcher_min_interval = 14000
     dispatcher_window_size = 100
     dispatcher_step_size = 1
     dispatcher_persistence = True
